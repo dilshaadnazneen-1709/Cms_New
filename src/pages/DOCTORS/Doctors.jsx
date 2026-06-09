@@ -353,10 +353,10 @@ function Doctors() {
     setEditForm(getInitialEditForm(doctor));
     setEditImageFile(null);
     setEditImagePreview(
-  resolveApiImageUrl(
-    getImageUrl(doctor)
-  )
-);
+      resolveApiImageUrl(
+        getImageUrl(doctor)
+      )
+    );
     setEditError("");
     setEditFieldErrors(getEmptyEditErrors());
   };
@@ -519,10 +519,10 @@ function Doctors() {
         previousDoctors.map((item) =>
           item.id === doctor.id
             ? {
-                ...item,
-                isActive: nextIsActive,
-                status: nextIsActive ? "Active" : "Inactive",
-              }
+              ...item,
+              isActive: nextIsActive,
+              status: nextIsActive ? "Active" : "Inactive",
+            }
             : item
         )
       );
@@ -624,7 +624,7 @@ function Doctors() {
 
       <div className="doctors-table">
         <div className="doctors-thead">
-          <span>Profile</span>
+          {/* <span>Profile</span> */}
           <span>Name</span>
           <span>Specialization</span>
           <span>Experience</span>

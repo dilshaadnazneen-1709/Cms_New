@@ -248,9 +248,8 @@ function AddDoctor() {
     fees: "0",
     email: "",
     phone: "",
-    password: "", // added
+    password: "",
   });
-
   const [image, setImage] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -350,7 +349,7 @@ function AddDoctor() {
     body.append("Fees", String(Number(form.fees) || 0));
     body.append("Email", form.email.trim());
     body.append("Phone", form.phone.trim());
-    body.append("Password", form.password); // added
+    body.append("Password", form.password);
     body.append("IsActive", "true");
     if (hospitalId) {
       body.append("HospitalId", hospitalId);
@@ -507,8 +506,7 @@ function AddDoctor() {
               ) : null}
             </div>
 
-            {/* Added Password Field */}
-            <div className="add-doctor-input-group">
+            {/* <div className="add-doctor-input-group">
               <label>Password</label>
               <input
                 name="password"
@@ -523,9 +521,9 @@ function AddDoctor() {
                   {fieldErrors.password}
                 </span>
               ) : null}
-            </div>
+            </div> */}
 
-            <div className="add-doctor-input-group add-doctor-input-group-half">
+            {/* <div className="add-doctor-input-group add-doctor-input-group-half">
               <label>Image</label>
               <input
                 type="file"
@@ -537,7 +535,7 @@ function AddDoctor() {
               {fieldErrors.image ? (
                 <span className="add-doctor-field-error">{fieldErrors.image}</span>
               ) : null}
-            </div>
+            </div> */}
 
           </div>
 

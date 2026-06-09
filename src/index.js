@@ -12,7 +12,6 @@ const clearInvalidStoredTokens = () => {
     "token",
     "adminToken",
     "doctorToken",
-    "receptionistToken",
   ].forEach((key) => {
     if (INVALID_STATIC_TOKENS.has(localStorage.getItem(key))) {
       localStorage.removeItem(key);
@@ -59,7 +58,7 @@ window.fetch = (input, init = {}) => {
 
   const requestHeaders =
     typeof Request !== "undefined" &&
-    input instanceof Request
+      input instanceof Request
       ? input.headers
       : undefined;
 
