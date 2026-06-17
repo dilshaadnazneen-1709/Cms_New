@@ -148,6 +148,88 @@ const getTimestamp = (value) => {
 
 const normalizeString = (value) => String(value || "").trim().toLowerCase();
 
+const roleLabels = {
+  superadmin: "Super Admin",
+  "super admin": "Super Admin",
+  admin: "Admin",
+  user: "User",
+  manager: "Manager",
+  doctor: "Doctor",
+  receptionist: "Receptionist",
+};
+
+const formatRoleLabel = (value) => {
+  const role = String(value || "").trim();
+  if (!role) return "";
+
+  const normalized = role.replace(/[_-]+/g, " ").toLowerCase();
+  if (roleLabels[normalized]) return roleLabels[normalized];
+
+  return normalized
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+};
+
+const auditActorSources = (log = {}) =>
+  [
+    log,
+    log.user,
+    log.actor,
+    log.performedBy,
+    log.createdBy,
+    log.updatedBy,
+    log.userDetails,
+    log.account,
+  ].filter((source) => source && typeof source === "object" && !Array.isArray(source));
+
+const pickAuditActorValue = (log, keys, fallback = "") => {
+  for (const source of auditActorSources(log)) {
+    const value = pick(source, keys, "");
+    if (hasValue(value)) return value;
+  }
+
+  return fallback;
+};
+
+const getAuditActorName = (log = {}) => {
+  if (typeof log.user === "string" && log.user.trim()) return log.user;
+
+  return pickAuditActorValue(
+    log,
+    [
+      "userName",
+      "name",
+      "fullName",
+      "displayName",
+      "adminName",
+      "email",
+      "emailAddress",
+      "userEmail",
+    ],
+    "System"
+  );
+};
+
+const getAuditActorRole = (log = {}) =>
+  formatRoleLabel(
+    pickAuditActorValue(log, [
+      "role",
+      "Role",
+      "roleName",
+      "RoleName",
+      "userRole",
+      "UserRole",
+      "actorRole",
+      "performedByRole",
+      "createdByRole",
+      "updatedByRole",
+      "type",
+      "userType",
+    ])
+  );
+
 const isUserLoginMatch = (user = {}, log = {}) => {
   const userEmail = normalizeString(pick(user, ["email", "emailAddress"]));
   const userName = normalizeString(pick(user, ["name", "fullName", "userName", "displayName"]));
@@ -410,13 +492,15 @@ export const normalizeRevenuePoint = (point = {}, index = 0) => ({
 
 export const normalizeAuditLog = (log = {}) => ({
   id: pick(log, ["id", "logId", "_id"]),
-  user: pick(log, ["user", "userName", "name", "email"], "System"),
-  userEmail: pick(log, ["email", "emailAddress", "userEmail"]),
+  user: getAuditActorName(log),
+  userEmail: pickAuditActorValue(log, ["email", "emailAddress", "userEmail"]),
   action: pick(log, ["action", "activity", "message", "description"]),
   timestampRaw: pick(log, ["timestamp", "createdAt", "date"]),
   timestamp: formatDateTime(pick(log, ["timestamp", "createdAt", "date"])),
   sortTime: getTimestamp(pick(log, ["timestamp", "createdAt", "date"])),
   module: pick(log, ["module", "moduleName", "category"], "Audit"),
+  ipAddress: pick(log, ["ipAddress", "ip", "clientIp"], ""),
+  role: getAuditActorRole(log),
 });
 
 export const normalizeLoginLog = (log = {}, index = 0) => ({
@@ -1032,6 +1116,7 @@ const recordSuperAdminActivity = (action, module, detail = "") =>
     module,
     description: detail,
     user: localStorage.getItem("userName") || localStorage.getItem("adminName") || "Super Admin",
+    role: localStorage.getItem("userRole") || localStorage.getItem("adminRole") || "Super Admin",
   });
 
 const toDashboardActivity = (activity, index = 0) => ({
