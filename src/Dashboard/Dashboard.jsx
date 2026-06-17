@@ -133,9 +133,9 @@ function Dashboard() {
                 "true",
               ...(token
                 ? {
-                    Authorization:
-                      `Bearer ${token}`,
-                  }
+                  Authorization:
+                    `Bearer ${token}`,
+                }
                 : {}),
             },
           });
@@ -849,5 +849,6 @@ function Dashboard() {
     </div>
   );
 }
+
 
 export default Dashboard;
